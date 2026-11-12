@@ -75,12 +75,16 @@ export default function DialogProvider () {
   }
 
   useEffect(() => {
+    let attachedClient: any
     const onShow = (packet: any) => {
-      // A 26.1 play-state holder can be an inline definition or a registry reference.
+      // In 26.1, configuration dialogs are inline NBT. Play dialogs use a holder:
+      // inline definitions are carried as the holder's value; registry references
+      // require a registry lookup and are intentionally not guessed here.
       const value = packet?.dialog
-      if (value && typeof value === 'object' && value.data) openDialog(value.data)
-      else if (value && typeof value === 'object' && value.type) openDialog(value)
-      else console.warn('[dialogs] Server sent a registry dialog reference; only inline definitions can currently be rendered.', packet)
+      if (value?.data && typeof value.data === 'object') openDialog(value.data)
+      else if (value?.type && String(value.type).startsWith('minecraft:')) openDialog(value)
+      else if (value?.type === 'value' && value.value) openDialog(value.value)
+      else console.warn('[dialogs] Unsupported or registry-referenced dialog packet', packet)
     }
     const onClear = () => {
       setDialog(null)
@@ -88,11 +92,20 @@ export default function DialogProvider () {
       setDialogHistory([])
       hideModal({ reactType: 'minecraft-dialog' }, undefined, { force: true })
     }
-    bot._client.on('show_dialog', onShow)
-    bot._client.on('clear_dialog', onClear)
+    const attach = () => {
+      if (!bot?._client || attachedClient === bot._client) return
+      attachedClient?.removeListener('show_dialog', onShow)
+      attachedClient?.removeListener('clear_dialog', onClear)
+      attachedClient = bot._client
+      attachedClient.on('show_dialog', onShow)
+      attachedClient.on('clear_dialog', onClear)
+    }
+    customEvents.on('mineflayerBotCreated', attach)
+    attach()
     return () => {
-      bot?._client?.removeListener('show_dialog', onShow)
-      bot?._client?.removeListener('clear_dialog', onClear)
+      customEvents.removeListener?.('mineflayerBotCreated', attach)
+      attachedClient?.removeListener('show_dialog', onShow)
+      attachedClient?.removeListener('clear_dialog', onClear)
     }
   }, [])
 
