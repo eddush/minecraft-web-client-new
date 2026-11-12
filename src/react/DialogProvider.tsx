@@ -21,7 +21,10 @@ const toTag = (value: any): any => {
   if (typeof value === 'string') return nbt.string(value)
   if (typeof value === 'boolean') return nbt.byte(value ? 1 : 0)
   if (typeof value === 'number') return Number.isInteger(value) ? nbt.int(value) : nbt.double(value)
-  if (Array.isArray(value)) return nbt.list(value.map(toTag), 'compound')
+  if (Array.isArray(value)) {
+    const items = value.map(toTag)
+    return nbt.list(items, items[0]?.type ?? 'string')
+  }
   if (value && typeof value === 'object') return nbt.comp(Object.fromEntries(Object.entries(value).map(([key, child]) => [key, toTag(child)])))
   return nbt.string('')
 }
