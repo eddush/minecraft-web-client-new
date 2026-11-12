@@ -100,7 +100,6 @@ export default function DialogProvider () {
     customEvents.on('mineflayerBotCreated', attach)
     attach()
     return () => {
-      customEvents.removeListener?.('mineflayerBotCreated', attach)
       attachedClient?.removeListener('show_dialog', onShow)
       attachedClient?.removeListener('clear_dialog', onClear)
     }
