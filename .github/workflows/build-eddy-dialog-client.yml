@@ -13,6 +13,10 @@ on:
       - 'rsbuild.config.ts'
       - 'config*.json'
 
+concurrency:
+  group: eddy-dialog-client-build
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
