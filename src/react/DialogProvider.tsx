@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import nbt from 'prismarine-nbt'
-import { hideCurrentModal, showModal } from '../globalState'
+import { hideModal, showModal } from '../globalState'
 import { useIsModalActive } from './utilsApp'
 
 type DialogAction = {
@@ -70,7 +70,7 @@ export default () => {
       }
       const onClear = () => {
         setDialog(null)
-        hideCurrentModal()
+        hideModal({ reactType: 'minecraft-dialog' })
       }
       client.on('show_dialog', onShow)
       client.on('clear_dialog', onClear)
@@ -81,7 +81,7 @@ export default () => {
 
   const close = () => {
     setDialog(null)
-    hideCurrentModal()
+    hideModal({ reactType: 'minecraft-dialog' })
   }
 
   const runAction = (button: any) => {
