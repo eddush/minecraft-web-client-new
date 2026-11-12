@@ -3,7 +3,7 @@ import { renderToDom, ErrorBoundary } from '@zardoy/react-util'
 import { useSnapshot } from 'valtio'
 import { QRCodeSVG } from 'qrcode.react'
 import { createPortal } from 'react-dom'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { activeModalStack, miscUiState } from './globalState'
 import DeathScreenProvider from './react/DeathScreenProvider'
 import OptionsRenderApp from './react/OptionsRenderApp'
@@ -43,6 +43,7 @@ import KeybindingsScreenProvider from './react/KeybindingsScreenProvider'
 import HeldMapUi from './react/HeldMapUi'
 import BedTime from './react/BedTime'
 import NoModalFoundProvider from './react/NoModalFoundProvider'
+import DialogProvider from './react/DialogProvider'
 import SignInMessageProvider from './react/SignInMessageProvider'
 import BookProvider from './react/BookProvider'
 import { options } from './optionsStorage'
@@ -275,6 +276,7 @@ const AppBase = () => {
             <CreditsAboutModal />
             <AllSettingsEditor />
             <NoModalFoundProvider />
+            <DialogProvider />
             <ProxiesList />
           </RobustPortal>
           <RobustPortal to={document.body}>
