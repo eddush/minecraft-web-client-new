@@ -45,6 +45,7 @@ import BedTime from './react/BedTime'
 import NoModalFoundProvider from './react/NoModalFoundProvider'
 import SignInMessageProvider from './react/SignInMessageProvider'
 import BookProvider from './react/BookProvider'
+import DialogProvider from './react/DialogProvider'
 import { options } from './optionsStorage'
 import BossBarOverlayProvider from './react/BossBarOverlayProvider'
 import VoiceChatConsentProvider from './react/VoiceChatConsentProvider'
@@ -266,6 +267,7 @@ const AppBase = () => {
             <ConnectOnlyServerUi />
             <TouchAreasControlsProvider />
             <SignInMessageProvider />
+            <DialogProvider />
             <PacketsReplayProvider />
             <NotificationProvider />
             <ModsPage />
