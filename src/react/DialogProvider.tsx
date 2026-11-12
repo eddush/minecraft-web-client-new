@@ -156,9 +156,11 @@ export default function DialogProvider () {
     } else if (type === 'show_dialog') {
       if (typeof action.dialog === 'object') openDialog(action.dialog)
     } else if (type === 'custom' || type === 'dynamic/custom') {
+      // Dialog input values are submitted as the custom action's NBT payload.
+      // Keep any payload fields configured by the server and add the user's form values.
       const payload = type === 'dynamic/custom'
         ? { ...(action.additions ?? {}), ...values }
-        : (action.payload ?? {})
+        : { ...(action.payload ?? {}), ...values }
       bot._client.write('custom_click_action', {
         id: String(action.id ?? ''),
         nbt: payload && Object.keys(payload).length ? toTag(payload) : undefined
