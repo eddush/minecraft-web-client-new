@@ -86,6 +86,7 @@ export default function DialogProvider () {
       const holder = packet?.dialog
       let value = holder
       if (holder?.data && typeof holder.data === 'object') value = holder.data
+      else if (Number.isInteger(holder?.dialog)) value = dialogRegistry.get(holder.dialog)
       else if (holder?.type === 'value' && holder.value) value = holder.value
       else if (holder?.type === 'id') {
         const id = Number(holder.id ?? holder.value)
