@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 import nbt from 'prismarine-nbt'
 import { hideModal, showModal } from '../globalState'
 import MessageFormattedString from './MessageFormattedString'
@@ -151,7 +152,7 @@ export default function DialogProvider () {
 
   if (!dialog) return null
 
-  const buttonStyle: React.CSSProperties = {
+  const buttonStyle: CSSProperties = {
     border: '1px solid #777',
     borderRadius: 4,
     background: '#555',
@@ -212,7 +213,6 @@ export default function DialogProvider () {
             <MessageFormattedString message={label} fallbackColor="white" />
           </button>
         })}
-        {type === 'notice' && <button type="button" style={buttonStyle} onClick={() => performAction(dialog.action?.action)}>OK</button>}
         {dialog.can_close_with_escape !== false && <button type="button" style={{ ...buttonStyle, background: '#3d3d3d' }} onClick={close}>Close</button>}
       </div>
     </div>
