@@ -107,7 +107,6 @@ export default function DialogProvider () {
     const attach = () => {
       if (!bot?._client || attachedClient === bot._client) return
       attachedClient?.removeListener('registry_data', onRegistryData)
-      attachedClient?.removeListener('registry_data', onRegistryData)
       attachedClient?.removeListener('show_dialog', onShow)
       attachedClient?.removeListener('clear_dialog', onClear)
       attachedClient = bot._client
@@ -118,6 +117,7 @@ export default function DialogProvider () {
     customEvents.on('mineflayerBotCreated', attach)
     attach()
     return () => {
+      attachedClient?.removeListener('registry_data', onRegistryData)
       attachedClient?.removeListener('show_dialog', onShow)
       attachedClient?.removeListener('clear_dialog', onClear)
     }
