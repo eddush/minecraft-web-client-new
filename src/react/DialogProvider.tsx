@@ -52,6 +52,7 @@ const DialogBody = ({ body }: { body: any }) => {
 export default function DialogProvider () {
   const [dialog, setDialog] = useState<AnyRecord | null>(null)
   const [inputValues, setInputValues] = useState<Record<string, any>>({})
+  const dialogRegistry = useMemo(() => new Map<number, any>(), [])
 
   const openDialog = (raw: any) => {
     const parsed = toPlain(raw)
@@ -74,15 +75,29 @@ export default function DialogProvider () {
 
   useEffect(() => {
     let attachedClient: any
+    const onRegistryData = (packet: any) => {
+      if (packet?.id !== 'minecraft:dialog' || !Array.isArray(packet.entries)) return
+      packet.entries.forEach((entry: any, index: number) => {
+        if (entry?.value) dialogRegistry.set(index, entry.value)
+      })
+    }
     const onShow = (packet: any) => {
-      // In 26.1, configuration dialogs are inline NBT. Play dialogs use a holder:
-      // inline definitions are carried as the holder's value; registry references
-      // require a registry lookup and are intentionally not guessed here.
-      const value = packet?.dialog
-      if (value?.data && typeof value.data === 'object') openDialog(value.data)
-      else if (value?.type && String(value.type).startsWith('minecraft:')) openDialog(value)
-      else if (value?.type === 'value' && value.value) openDialog(value.value)
-      else console.warn('[dialogs] Unsupported or registry-referenced dialog packet', packet)
+      // 26.1 uses an inline NBT value or a holder referring to the synced dialog registry.
+      const holder = packet?.dialog
+      let value = holder
+      if (holder?.data && typeof holder.data === 'object') value = holder.data
+      else if (holder?.type === 'value' && holder.value) value = holder.value
+      else if (holder?.type === 'id') {
+        const id = Number(holder.id ?? holder.value)
+        value = dialogRegistry.get(id) ?? dialogRegistry.get(id - 1)
+      } else if (holder?.hasKnownType === true) {
+        const id = Number(holder.knownType ?? holder.id)
+        value = dialogRegistry.get(id) ?? dialogRegistry.get(id - 1)
+      } else if (typeof holder === 'number') {
+        value = dialogRegistry.get(holder) ?? dialogRegistry.get(holder - 1)
+      }
+      if (value && typeof value === 'object') openDialog(value)
+      else console.warn('[dialogs] Could not resolve the dialog registry reference', packet)
     }
     const onClear = () => {
       setDialog(null)
@@ -91,9 +106,12 @@ export default function DialogProvider () {
     }
     const attach = () => {
       if (!bot?._client || attachedClient === bot._client) return
+      attachedClient?.removeListener('registry_data', onRegistryData)
+      attachedClient?.removeListener('registry_data', onRegistryData)
       attachedClient?.removeListener('show_dialog', onShow)
       attachedClient?.removeListener('clear_dialog', onClear)
       attachedClient = bot._client
+      attachedClient.on('registry_data', onRegistryData)
       attachedClient.on('show_dialog', onShow)
       attachedClient.on('clear_dialog', onClear)
     }
