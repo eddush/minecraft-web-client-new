@@ -1,0 +1,54 @@
+name: Build EddyDev single-file client
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/minecraft-26-1-dialogs
+    paths:
+      - '.github/workflows/build-eddy-dialog-client.yml'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'rsbuild.config.ts'
+      - 'config*.json'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build standalone HTML
+        run: pnpm build-single-file
+        env:
+          LOCAL_CONFIG_FILE: config.mcraft-only.json
+
+      - name: Rename output
+        run: cp dist/single/index.html EddyDev-Minecraft-Web-Client.html
+
+      - name: Upload HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EddyDev-Minecraft-Web-Client
+          path: EddyDev-Minecraft-Web-Client.html
+          if-no-files-found: error
+          retention-days: 14
