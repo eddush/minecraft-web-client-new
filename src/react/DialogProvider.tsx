@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import nbt from 'prismarine-nbt'
 import { hideCurrentModal, showModal } from '../globalState'
 import { useIsModalActive } from './utilsApp'
