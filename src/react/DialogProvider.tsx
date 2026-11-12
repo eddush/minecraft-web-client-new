@@ -52,7 +52,6 @@ const DialogBody = ({ body }: { body: any }) => {
 export default function DialogProvider () {
   const [dialog, setDialog] = useState<AnyRecord | null>(null)
   const [inputValues, setInputValues] = useState<Record<string, any>>({})
-  const [dialogHistory, setDialogHistory] = useState<AnyRecord[]>([])
 
   const openDialog = (raw: any) => {
     const parsed = toPlain(raw)
@@ -60,7 +59,6 @@ export default function DialogProvider () {
       console.warn('[dialogs] Unsupported dialog packet', raw)
       return
     }
-    setDialogHistory(history => [...history, parsed])
     setDialog(parsed)
     const initial: Record<string, any> = {}
     for (const input of parsed.inputs ?? []) {
@@ -89,7 +87,6 @@ export default function DialogProvider () {
     const onClear = () => {
       setDialog(null)
       setInputValues({})
-      setDialogHistory([])
       hideModal({ reactType: 'minecraft-dialog' }, undefined, { force: true })
     }
     const attach = () => {
@@ -112,7 +109,6 @@ export default function DialogProvider () {
   const close = () => {
     setDialog(null)
     setInputValues({})
-    setDialogHistory([])
     hideModal({ reactType: 'minecraft-dialog' }, undefined, { force: true })
   }
 
@@ -131,7 +127,6 @@ export default function DialogProvider () {
     } else if (type === 'suggest_command') {
       const command = String(action.command ?? '')
       window.dispatchEvent(new CustomEvent('openChat', { detail: command }))
-      bot.chat(command)
     } else if (type === 'open_url') {
       const url = String(action.url ?? '')
       if (/^https?:\/\//i.test(url)) window.open(url, '_blank', 'noopener,noreferrer')
